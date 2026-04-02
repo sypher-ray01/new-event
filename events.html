@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventHub - Explore Events</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body data-page="events">
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand"><i class="fas fa-calendar-alt"></i><span>EventHub</span></div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="events.html" class="nav-link active">Events</a></li>
+                <li><a href="create.html" class="nav-link">Create Event</a></li>
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn-notification" id="notificationBtn"><i class="fas fa-bell"></i><span class="notification-badge" id="notificationBadge">0</span></button>
+                <button class="btn-primary" id="loginBtn">Login</button>
+            </div>
+        </nav>
+    </header>
+
+    <section class="events-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Explore Events</h2>
+                <p>Find the perfect event tailored to your interests</p>
+            </div>
+
+            <div class="filters-panel reveal">
+                <div class="filter-group">
+                    <label><i class="fas fa-tag"></i> Category</label>
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="music">Music & Concerts</option>
+                        <option value="business">Business</option>
+                        <option value="tech">Technology</option>
+                        <option value="sports">Sports</option>
+                        <option value="food">Food & Drink</option>
+                        <option value="art">Arts & Culture</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-calendar"></i> Date Range</label>
+                    <input type="date" id="startDate">
+                    <input type="date" id="endDate">
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Location</label>
+                    <input type="text" id="locationFilter" placeholder="City...">
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-indian-rupee-sign"></i> Price Range</label>
+                    <div class="price-range">
+                        <input type="number" id="minPrice" placeholder="Min">
+                        <span>-</span>
+                        <input type="number" id="maxPrice" placeholder="Max">
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn-filter" id="applyFilters">Apply</button>
+                    <button class="btn-reset" id="resetFilters">Reset</button>
+                </div>
+            </div> 
+            
+            <div class="events-grid reveal" id="eventsGrid"></div>
+            
+        </div>
+    </section>
+
+    <div class="modal" id="eventModal">
+        <div class="modal-content event-detail">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <div id="eventDetailContent"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="bookingModal">
+        <div class="modal-content booking-form">
+            <button class="modal-close" id="closeBookingModal">&times;</button>
+            <h2>Complete Your Booking</h2>
+            <form id="bookingForm"><div id="bookingContent"></div></form>
+        </div>
+    </div>
+
+    <div class="notification-panel" id="notificationPanel">
+        <div class="panel-header"><h3>Notifications</h3><button id="closeNotificationPanel">&times;</button></div>
+        <div class="notifications-list" id="notificationsList"></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/standalone.js"></script>
+</body>
+</html>

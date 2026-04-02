@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventHub - Premier Event Management Platform</title>
+    <link rel="stylesheet" href="style-2.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Page separation styles */
+        .page-section {
+            display: none;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-calendar-alt"></i>
+                <span>EventHub</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active" data-page="home">Home</a></li>
+                <li><a href="#events" class="nav-link" data-page="events">Events</a></li>
+                <li><a href="#create" class="nav-link" data-page="create">Create Event</a></li>
+                <li><a href="#dashboard" class="nav-link" data-page="dashboard">Dashboard</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn-notification" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </button>
+                <div id="authButtons" style="display: flex; gap: 0.5rem; align-items: center;">
+                    <a href="register.html" class="btn-primary" style="text-decoration: none; display: inline-block;" id="registerBtn">Register</a>
+                    <a href="login.html" class="btn-primary" style="text-decoration: none; display: inline-block;" id="loginBtn">Login</a>
+                </div>
+                <div id="userMenu" style="display: none; align-items: center; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-user-circle" style="font-size: 1.5rem; color: var(--primary);"></i>
+                        <span id="userName" style="font-weight: 600; color: var(--dark);"></span>
+                    </div>
+                    <button class="btn-primary" id="logoutBtn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section (HOME PAGE) -->
+    <section id="home" class="hero page-section active">
+        <div class="hero-content">
+            <h1 class="hero-title">Discover Amazing Events Near You</h1>
+            <p class="hero-subtitle">Connect, explore, and create unforgettable experiences</p>
+            <div class="hero-search">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="heroSearch" placeholder="Search for events, categories, or locations...">
+                </div>
+                <button class="btn-search" id="heroSearchBtn">Search</button>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <h3 id="heroEventCount">Loading...</h3>
+                    <p>Active Events</p>
+                </div>
+                <div class="stat-item">
+                    <h3 id="heroAttendeeCount">50K+</h3>
+                    <p>Happy Attendees</p>
+                </div>
+                <div class="stat-item">
+                    <h3 id="heroOrganizerCount">1,200+</h3>
+                    <p>Event Organizers</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advanced Search & Filter Section (EVENTS PAGE) -->
+    <section id="events" class="events-section page-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Explore Events</h2>
+                <p>Find the perfect event tailored to your interests</p>
+            </div>
+
+            <!-- Advanced Filters -->
+            <div class="filters-panel">
+                <div class="filter-group">
+                    <label><i class="fas fa-tag"></i> Category</label>
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="Music">Music & Concerts</option>
+                        <option value="Business">Business & Professional</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Sports">Sports & Fitness</option>
+                        <option value="Food">Food & Drink</option>
+                        <option value="Arts">Arts & Culture</option>
+                        <option value="Education">Education</option>
+                        <option value="Charity">Charity & Causes</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-calendar"></i> Date Range</label>
+                    <input type="date" id="startDate">
+                    <input type="date" id="endDate">
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Location</label>
+                    <input type="text" id="locationFilter" placeholder="City or venue...">
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-rupee-sign"></i> Price Range</label>
+                    <div class="price-range">
+                        <input type="number" id="minPrice" placeholder="Min" min="0">
+                        <span>-</span>
+                        <input type="number" id="maxPrice" placeholder="Max" min="0">
+                    </div>
+                </div>
+                <button class="btn-filter" id="applyFilters">Apply Filters</button>
+                <button class="btn-reset" id="resetFilters">Reset</button>
+            </div>
+
+            <!-- Events Grid -->
+            <div class="events-grid" id="eventsGrid"></div>
+        </div>
+    </section>
+
+    <!-- Create Event Section (CREATE EVENT PAGE) -->
+    <section id="create" class="create-event-section page-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 id="formTitle">Create Your Event</h2>
+                <p id="formSubtitle">Bring your vision to life and connect with your audience</p>
+            </div>
+            <form class="event-form" id="createEventForm">
+                <input type="hidden" id="eventId" value="">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Event Title *</label>
+                        <input type="text" id="eventTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="eventCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Music">Music & Concerts</option>
+                            <option value="Business">Business & Professional</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Sports">Sports & Fitness</option>
+                            <option value="Food">Food & Drink</option>
+                            <option value="Arts">Arts & Culture</option>
+                            <option value="Education">Education</option>
+                            <option value="Charity">Charity & Causes</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea id="eventDescription" rows="4" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Start Date & Time *</label>
+                        <input type="datetime-local" id="eventStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Date & Time *</label>
+                        <input type="datetime-local" id="eventEndDate" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Venue Name *</label>
+                        <input type="text" id="venueName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Address *</label>
+                        <input type="text" id="venueAddress" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>City *</label>
+                        <input type="text" id="venueCity" required>
+                    </div>
+                    <div class="form-group">
+                        <label>State/Province *</label>
+                        <input type="text" id="venueState" required>
+                    </div>
+                </div>
+
+                <!-- Ticketing Section -->
+                <div class="ticketing-section">
+                    <h3>Ticket Configuration</h3>
+                    <div id="ticketTypes">
+                        <div class="ticket-type">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Ticket Type</label>
+                                    <input type="text" class="ticketName" placeholder="e.g., General Admission" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Price (₹)</label>
+                                    <input type="number" class="ticketPrice" min="0" step="0.01" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Quantity</label>
+                                    <input type="number" class="ticketQuantity" min="1" required>
+                                </div>
+                                <button type="button" class="btn-remove-ticket"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-add-ticket" id="addTicketType">
+                        <i class="fas fa-plus"></i> Add Ticket Type
+                    </button>
+                </div>
+
+                <!-- Vendor Details Section -->
+                <div class="vendor-section">
+                    <h3>Vendor & Service Providers</h3>
+                    <div id="vendorList">
+                        <div class="vendor-item">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Vendor Type</label>
+                                    <select class="vendorType" required>
+                                        <option value="">Select Type</option>
+                                        <option value="catering">Catering</option>
+                                        <option value="photography">Photography</option>
+                                        <option value="audio">Audio/Visual</option>
+                                        <option value="decoration">Decoration</option>
+                                        <option value="security">Security</option>
+                                        <option value="entertainment">Entertainment</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Vendor Name</label>
+                                    <input type="text" class="vendorName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Contact</label>
+                                    <input type="text" class="vendorContact" required>
+                                </div>
+                                <button type="button" class="btn-remove-vendor"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-add-vendor" id="addVendor">
+                        <i class="fas fa-plus"></i> Add Vendor
+                    </button>
+                </div>
+
+                <!-- Group Booking Options -->
+                <div class="group-booking-section">
+                    <h3>Group Booking Options</h3>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="enableGroupBooking">
+                            Enable Group Bookings with Discounts
+                        </label>
+                    </div>
+                    <div id="groupBookingOptions" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Minimum Group Size</label>
+                                <input type="number" id="groupMinSize" min="2" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label>Discount Percentage</label>
+                                <input type="number" id="groupDiscount" min="1" max="50" value="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="eventSubmitBtn">Create Event</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Dashboard Section (DASHBOARD PAGE) -->
+    <section id="dashboard" class="dashboard-section page-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Event Dashboard</h2>
+                <p>Manage your events and track performance</p>
+            </div>
+            
+            <!-- Dashboard Overview Stats -->
+            <div class="dashboard-overview">
+                <div class="stat-card overview-card">
+                    <div class="stat-icon-wrapper">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalEvents">0</h3>
+                        <p>Total Events</p>
+                    </div>
+                </div>
+                <div class="stat-card overview-card">
+                    <div class="stat-icon-wrapper">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalBookings">0</h3>
+                        <p>Total Bookings</p>
+                    </div>
+                </div>
+                <div class="stat-card overview-card">
+                    <div class="stat-icon-wrapper">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalAttendeesOverview">0</h3>
+                        <p>Total Attendees</p>
+                    </div>
+                </div>
+                <div class="stat-card overview-card">
+                    <div class="stat-icon-wrapper">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalRevenue">₹0</h3>
+                        <p>Total Revenue</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-tabs">
+                <button class="tab-btn active" data-tab="myEvents">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>My Events</span>
+                </button>
+                <button class="tab-btn" data-tab="bookings">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>My Bookings</span>
+                </button>
+                <button class="tab-btn" data-tab="attendees">
+                    <i class="fas fa-users"></i>
+                    <span>Attendees</span>
+                </button>
+                <button class="tab-btn" data-tab="reminders">
+                    <i class="fas fa-bell"></i>
+                    <span>Reminders</span>
+                </button>
+            </div>
+
+            <div class="tab-content active" id="myEvents">
+                <div class="dashboard-events" id="dashboardEvents">
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-plus"></i>
+                        <h3>No events yet</h3>
+                        <p>Create your first event to get started</p>
+                        <a href="#create" class="btn-primary" style="text-decoration: none; display: inline-block; margin-top: 1rem;">
+                            <i class="fas fa-plus"></i> Create Event
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="bookings">
+                <div class="bookings-list" id="bookingsList">
+                    <div class="empty-state">
+                        <i class="fas fa-ticket-alt"></i>
+                        <h3>No bookings yet</h3>
+                        <p>Your event bookings will appear here</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="attendees">
+                <div class="attendees-panel">
+                    <div class="attendee-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-users"></i>
+                            <h3 id="totalAttendees">0</h3>
+                            <p>Total Attendees</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle"></i>
+                            <h3 id="checkedIn">0</h3>
+                            <p>Checked In</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <h3 id="pending">0</h3>
+                            <p>Pending</p>
+                        </div>
+                    </div>
+                    <div class="attendees-list" id="attendeesList">
+                        <div class="empty-state">
+                            <i class="fas fa-user-friends"></i>
+                            <h3>No attendees yet</h3>
+                            <p>Attendees will appear here once they register for your events</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="reminders">
+                <div class="reminders-panel">
+                    <div class="panel-header-flex">
+                        <h3>Event Reminders</h3>
+                        <button class="btn-add-reminder" id="addReminderBtn">
+                            <i class="fas fa-plus"></i> Add Reminder
+                        </button>
+                    </div>
+                    <div class="reminders-list" id="remindersList">
+                        <div class="empty-state">
+                            <i class="fas fa-bell-slash"></i>
+                            <h3>No reminders set</h3>
+                            <p>Create reminders to stay on top of your events</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Event Detail Modal -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content event-detail">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <div id="eventDetailContent"></div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content booking-form">
+            <button class="modal-close" id="closeBookingModal">&times;</button>
+            <h2>Complete Your Booking</h2>
+            <form id="bookingForm">
+                <div id="bookingContent"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reminder Modal -->
+    <div class="modal" id="reminderModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeReminderModal">&times;</button>
+            <h2>Set Event Reminder</h2>
+            <form id="reminderForm">
+                <div class="form-group">
+                    <label>Select Event</label>
+                    <select id="reminderEvent" class="form-input" required style="width: 100%; padding: 0.9rem 1rem; border: 2px solid var(--light-alt); border-radius: 10px; font-size: 1rem;"></select>
+                </div>
+                <div class="form-group">
+                    <label>Reminder Date & Time</label>
+                    <input type="datetime-local" id="reminderDateTime" class="form-input" required style="width: 100%; padding: 0.9rem 1rem; border: 2px solid var(--light-alt); border-radius: 10px; font-size: 1rem;">
+                </div>
+                <div class="form-group">
+                    <label>Reminder Message</label>
+                    <textarea id="reminderMessage" rows="3" class="form-input" required style="width: 100%; padding: 0.9rem 1rem; border: 2px solid var(--light-alt); border-radius: 10px; font-size: 1rem; resize: vertical;"></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Set Reminder</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="panel-header">
+            <h3>Notifications</h3>
+            <button id="closeNotificationPanel">&times;</button>
+        </div>
+        <div class="notifications-list" id="notificationsList"></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Page navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.page-section');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links and sections
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    sections.forEach(s => s.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Show corresponding section
+                    const pageId = this.getAttribute('data-page');
+                    const targetSection = document.getElementById(pageId);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                        
+                        // Load data when section is shown
+                        if (pageId === 'events') {
+                            loadEvents();
+                        } else if (pageId === 'dashboard') {
+                            loadDashboard();
+                        } else if (pageId === 'create') {
+                            // Reset form when navigating to create (unless editing)
+                            const eventId = document.getElementById('eventId').value;
+                            if (!eventId) {
+                                resetEventForm();
+                            }
+                        }
+                    }
+                    
+                    // Scroll to top
+                    window.scrollTo(0, 0);
+                });
+            });
+            
+            // Handle hash navigation on page load
+            if (window.location.hash) {
+                const hash = window.location.hash.substring(1);
+                const targetLink = document.querySelector(`[data-page="${hash}"]`);
+                if (targetLink) {
+                    targetLink.click();
+                }
+            } else {
+                // Load initial data
+                loadHeroStats();
+                if (window.API && window.API.isAuthenticated()) {
+                    loadDashboard();
+                }
+            }
+
+            // Dashboard tab functionality
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+
+                    // Remove active class from all buttons and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Add active class to clicked button and corresponding content
+                    this.classList.add('active');
+                    const targetContent = document.getElementById(targetTab);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                });
+            });
+
+            // Create Event Form Handler
+            const createEventForm = document.getElementById('createEventForm');
+            if (createEventForm) {
+                createEventForm.addEventListener('submit', handleCreateEvent);
+            }
+
+            // Add Ticket Type Button
+            const addTicketBtn = document.getElementById('addTicketType');
+            if (addTicketBtn) {
+                addTicketBtn.addEventListener('click', addTicketType);
+            }
+
+            // Add Vendor Button
+            const addVendorBtn = document.getElementById('addVendor');
+            if (addVendorBtn) {
+                addVendorBtn.addEventListener('click', addVendor);
+            }
+
+            // Remove Ticket/Vendor handlers (delegated)
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.btn-remove-ticket')) {
+                    e.target.closest('.ticket-type').remove();
+                }
+                if (e.target.closest('.btn-remove-vendor')) {
+                    e.target.closest('.vendor-item').remove();
+                }
+            });
+
+            // Group Booking Toggle
+            const enableGroupBooking = document.getElementById('enableGroupBooking');
+            const groupBookingOptions = document.getElementById('groupBookingOptions');
+            if (enableGroupBooking && groupBookingOptions) {
+                enableGroupBooking.addEventListener('change', (e) => {
+                    groupBookingOptions.style.display = e.target.checked ? 'block' : 'none';
+                });
+            }
+
+            // Filter functionality
+            const applyFiltersBtn = document.getElementById('applyFilters');
+            const resetFiltersBtn = document.getElementById('resetFilters');
+            
+            if (applyFiltersBtn) {
+                applyFiltersBtn.addEventListener('click', applyEventFilters);
+            }
+            
+            if (resetFiltersBtn) {
+                resetFiltersBtn.addEventListener('click', resetEventFilters);
+            }
+
+            // Check authentication status and update UI
+            updateAuthUI();
+
+            // Reminder functionality
+            const addReminderBtn = document.getElementById('addReminderBtn');
+            const reminderModal = document.getElementById('reminderModal');
+            const closeReminderModal = document.getElementById('closeReminderModal');
+            const reminderForm = document.getElementById('reminderForm');
+
+            if (addReminderBtn) {
+                addReminderBtn.addEventListener('click', () => {
+                    if (!window.API || !window.API.isAuthenticated()) {
+                        alert('Please login to set reminders');
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    openReminderModal();
+                });
+            }
+
+            if (closeReminderModal) {
+                closeReminderModal.addEventListener('click', () => {
+                    reminderModal.style.display = 'none';
+                    reminderModal.classList.remove('active');
+                });
+            }
+
+            // Close modal when clicking outside
+            if (reminderModal) {
+                reminderModal.addEventListener('click', (e) => {
+                    if (e.target === reminderModal) {
+                        reminderModal.style.display = 'none';
+                        reminderModal.classList.remove('active');
+                    }
+                });
+            }
+
+            if (reminderForm) {
+                reminderForm.addEventListener('submit', handleReminderSubmit);
+            }
+
+            // Logout functionality
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', handleLogout);
+            }
+
+            // Load reminders on page load
+            loadReminders();
+        });
+
+        // Load Hero Stats
+        async function loadHeroStats() {
+            try {
+                const response = await window.API.events.getAll({ status: 'published' });
+                if (response.success) {
+                    const eventCount = response.total || (response.data ? response.data.length : 0);
+                    const eventCountEl = document.getElementById('heroEventCount');
+                    if (eventCountEl) {
+                        eventCountEl.textContent = `${eventCount.toLocaleString()}+`;
+                    }
+
+                    // Calculate total attendees from all events
+                    let totalAttendees = 0;
+                    if (response.data && Array.isArray(response.data)) {
+                        totalAttendees = response.data.reduce((sum, event) => {
+                            return sum + (event.attendees && Array.isArray(event.attendees) ? event.attendees.length : 0);
+                        }, 0);
+                    }
+                    const attendeeCountEl = document.getElementById('heroAttendeeCount');
+                    if (attendeeCountEl) {
+                        attendeeCountEl.textContent = totalAttendees > 0 ? `${totalAttendees.toLocaleString()}+` : '50K+';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading hero stats:', error);
+                // Set default values on error
+                const eventCountEl = document.getElementById('heroEventCount');
+                if (eventCountEl) eventCountEl.textContent = '2,500+';
+            }
+        }
+
+        // Load Events for Events Section
+        async function loadEvents(filters = {}) {
+            const eventsGrid = document.getElementById('eventsGrid');
+            if (!eventsGrid) return;
+
+            try {
+                eventsGrid.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary);"></i></div>';
+                
+                // Build query parameters
+                const params = { status: 'published', ...filters };
+                
+                const response = await window.API.events.getAll(params);
+                
+                if (response.success && response.data && response.data.length > 0) {
+                    eventsGrid.innerHTML = '';
+                    response.data.forEach(event => {
+                        const eventCard = createEventCard(event);
+                        eventsGrid.appendChild(eventCard);
+                    });
+                } else {
+                    eventsGrid.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><h3>No events found</h3><p>Be the first to create an event!</p></div>';
+                }
+            } catch (error) {
+                console.error('Error loading events:', error);
+                eventsGrid.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Error loading events</h3><p>Please try again later</p></div>';
+            }
+        }
+
+        // Apply Event Filters
+        function applyEventFilters() {
+            const category = document.getElementById('categoryFilter').value;
+            const location = document.getElementById('locationFilter').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const minPrice = document.getElementById('minPrice').value;
+            const maxPrice = document.getElementById('maxPrice').value;
+
+            const filters = {};
+            
+            if (category) filters.category = category;
+            if (location) filters.location = location;
+            if (startDate) filters.startDate = startDate;
+            if (endDate) filters.endDate = endDate;
+            if (minPrice) filters.minPrice = minPrice;
+            if (maxPrice) filters.maxPrice = maxPrice;
+
+            loadEvents(filters);
+        }
+
+        // Reset Event Filters
+        function resetEventFilters() {
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('locationFilter').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            
+            loadEvents();
+        }
+
+        // Create Event Card Element
+        function createEventCard(event) {
+            const card = document.createElement('div');
+            card.className = 'event-card';
+            
+            // Get category icon
+            const categoryIcons = {
+                'Music': 'fa-music',
+                'Business': 'fa-briefcase',
+                'Technology': 'fa-laptop-code',
+                'Sports': 'fa-football-ball',
+                'Food': 'fa-utensils',
+                'Arts': 'fa-palette',
+                'Education': 'fa-graduation-cap',
+                'Charity': 'fa-heart',
+                'Other': 'fa-calendar-alt'
+            };
+            
+            const categoryIcon = categoryIcons[event.category] || 'fa-calendar-alt';
+            const categoryColors = {
+                'Music': 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)',
+                'Business': 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+                'Technology': 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)',
+                'Sports': 'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
+                'Food': 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
+                'Arts': 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
+                'Education': 'linear-gradient(135deg, #06B6D4 0%, #22D3EE 100%)',
+                'Charity': 'linear-gradient(135deg, #EF4444 0%, #F87171 100%)',
+                'Other': 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)'
+            };
+            
+            const cardGradient = categoryColors[event.category] || categoryColors['Other'];
+            
+            card.innerHTML = `
+                <div class="event-image" style="background: ${cardGradient}; height: 200px; border-radius: 12px 12px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-size: 3rem; position: relative; overflow: hidden;">
+                    <i class="fas ${categoryIcon}"></i>
+                    <span style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">${event.category}</span>
+                </div>
+                <div class="event-content" style="padding: 1.5rem;">
+                    <h3 style="color: var(--primary); margin-bottom: 0.5rem; font-size: 1.3rem; font-weight: 700;">${event.title}</h3>
+                    <p style="color: var(--dark-alt); margin-bottom: 1rem; font-size: 0.9rem; line-height: 1.5;">${event.description.substring(0, 100)}${event.description.length > 100 ? '...' : ''}</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; font-size: 0.85rem; color: var(--dark-alt);">
+                        <span style="display: flex; align-items: center; gap: 0.3rem;"><i class="fas fa-calendar"></i> ${new Date(event.startDate).toLocaleDateString()}</span>
+                        <span style="display: flex; align-items: center; gap: 0.3rem;"><i class="fas fa-map-marker-alt"></i> ${event.location}</span>
+                        ${event.attendees && event.attendees.length > 0 ? `<span style="display: flex; align-items: center; gap: 0.3rem;"><i class="fas fa-users"></i> ${event.attendees.length} attending</span>` : ''}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 700; color: var(--primary); font-size: 1.1rem;">${event.price > 0 ? '₹' + event.price : 'Free'}</span>
+                        <button class="btn-book" onclick="registerForEvent('${event._id}')">Book Now</button>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        // Load Dashboard Data
+        async function loadDashboard() {
+            if (!window.API || !window.API.isAuthenticated()) {
+                return;
+            }
+
+            try {
+                // Load user's events
+                const myEventsResponse = await window.API.events.getMyEvents();
+                if (myEventsResponse.success) {
+                    displayDashboardEvents(myEventsResponse.data || []);
+                    updateDashboardStats(myEventsResponse.data || []);
+                }
+
+                // Load bookings/registrations
+                const bookingsResponse = await window.API.events.getMyRegistrations();
+                if (bookingsResponse.success) {
+                    displayBookings(bookingsResponse.data || []);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        // Display Dashboard Events
+        function displayDashboardEvents(events) {
+            const dashboardEvents = document.getElementById('dashboardEvents');
+            if (!dashboardEvents) return;
+
+            if (events.length === 0) {
+                dashboardEvents.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-plus"></i>
+                        <h3>No events yet</h3>
+                        <p>Create your first event to get started</p>
+                        <a href="#create" class="btn-primary" style="text-decoration: none; display: inline-block; margin-top: 1rem;">
+                            <i class="fas fa-plus"></i> Create Event
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            dashboardEvents.innerHTML = '';
+            events.forEach(event => {
+                const eventCard = document.createElement('div');
+                eventCard.className = 'dashboard-event-card';
+                eventCard.innerHTML = `
+                    <div class="dashboard-event-info">
+                        <h3>${event.title}</h3>
+                        <p style="color: var(--dark-alt); margin: 0.5rem 0;">${event.description.substring(0, 150)}${event.description.length > 150 ? '...' : ''}</p>
+                        <div class="dashboard-event-stats">
+                            <span><i class="fas fa-calendar"></i> ${new Date(event.startDate).toLocaleDateString()}</span>
+                            <span><i class="fas fa-map-marker-alt"></i> ${event.location}</span>
+                            <span><i class="fas fa-users"></i> ${event.attendees ? event.attendees.length : 0} attendees</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-event-actions">
+                        <button class="btn-action" onclick="editEvent('${event._id}')"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn-action btn-danger" onclick="deleteEvent('${event._id}')"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                `;
+                dashboardEvents.appendChild(eventCard);
+            });
+        }
+
+        // Display Bookings
+        function displayBookings(bookings) {
+            const bookingsList = document.getElementById('bookingsList');
+            if (!bookingsList) return;
+
+            if (bookings.length === 0) {
+                bookingsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-ticket-alt"></i>
+                        <h3>No bookings yet</h3>
+                        <p>Your event bookings will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            bookingsList.innerHTML = '';
+            bookings.forEach(event => {
+                const bookingCard = document.createElement('div');
+                bookingCard.className = 'booking-card';
+                bookingCard.innerHTML = `
+                    <h3>${event.title}</h3>
+                    <p>${new Date(event.startDate).toLocaleDateString()} - ${event.location}</p>
+                `;
+                bookingsList.appendChild(bookingCard);
+            });
+        }
+
+        // Update Dashboard Stats
+        function updateDashboardStats(events) {
+            const totalEvents = events.length;
+            const totalAttendees = events.reduce((sum, event) => sum + (event.attendees ? event.attendees.length : 0), 0);
+            const totalRevenue = events.reduce((sum, event) => sum + (event.price || 0) * (event.attendees ? event.attendees.length : 0), 0);
+
+            const totalEventsEl = document.getElementById('totalEvents');
+            const totalBookingsEl = document.getElementById('totalBookings');
+            const totalAttendeesOverviewEl = document.getElementById('totalAttendeesOverview');
+            const totalRevenueEl = document.getElementById('totalRevenue');
+
+            if (totalEventsEl) totalEventsEl.textContent = totalEvents;
+            if (totalBookingsEl) totalBookingsEl.textContent = totalAttendees;
+            if (totalAttendeesOverviewEl) totalAttendeesOverviewEl.textContent = totalAttendees;
+            if (totalRevenueEl) totalRevenueEl.textContent = `₹${totalRevenue.toLocaleString()}`;
+        }
+
+        // Handle Create/Update Event
+        async function handleCreateEvent(e) {
+            e.preventDefault();
+            
+            if (!window.API || !window.API.isAuthenticated()) {
+                alert('Please login to create events');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const eventId = document.getElementById('eventId').value;
+            const isEdit = !!eventId;
+            const submitBtn = e.target.querySelector('.btn-submit');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${isEdit ? 'Updating...' : 'Creating...'}`;
+
+            try {
+                // Collect form data
+                const tickets = [];
+                document.querySelectorAll('.ticket-type').forEach(ticket => {
+                    const name = ticket.querySelector('.ticketName').value;
+                    const price = parseFloat(ticket.querySelector('.ticketPrice').value);
+                    const quantity = parseInt(ticket.querySelector('.ticketQuantity').value);
+                    if (name && price >= 0 && quantity > 0) {
+                        tickets.push({ name, price, quantity, sold: 0 });
+                    }
+                });
+
+                const vendors = [];
+                document.querySelectorAll('.vendor-item').forEach(vendor => {
+                    const type = vendor.querySelector('.vendorType').value;
+                    const name = vendor.querySelector('.vendorName').value;
+                    const contact = vendor.querySelector('.vendorContact').value;
+                    if (type && name && contact) {
+                        vendors.push({ name, contact, description: type });
+                    }
+                });
+
+                const eventData = {
+                    title: document.getElementById('eventTitle').value,
+                    description: document.getElementById('eventDescription').value,
+                    category: document.getElementById('eventCategory').value,
+                    startDate: new Date(document.getElementById('eventStartDate').value).toISOString(),
+                    endDate: new Date(document.getElementById('eventEndDate').value).toISOString(),
+                    location: document.getElementById('venueName').value,
+                    address: `${document.getElementById('venueAddress').value}, ${document.getElementById('venueCity').value}, ${document.getElementById('venueState').value}`,
+                    tickets: tickets,
+                    vendors: vendors,
+                    price: tickets.length > 0 ? Math.min(...tickets.map(t => t.price)) : 0,
+                    capacity: tickets.reduce((sum, t) => sum + t.quantity, 0),
+                    status: 'published'
+                };
+
+                let response;
+                if (isEdit) {
+                    response = await window.API.events.update(eventId, eventData);
+                } else {
+                    response = await window.API.events.create(eventData);
+                }
+
+                if (response.success) {
+                    // Show success message
+                    showNotification('success', `Event ${isEdit ? 'updated' : 'created'} successfully!`);
+                    
+                    // Reset form
+                    resetEventForm();
+                    
+                    // Reload dashboard and events
+                    await loadDashboard();
+                    await loadEvents();
+                    await loadHeroStats();
+                    
+                    // Navigate to dashboard
+                    setTimeout(() => {
+                        document.querySelector('[data-page="dashboard"]').click();
+                    }, 1000);
+                } else {
+                    throw new Error(response.message || `Failed to ${isEdit ? 'update' : 'create'} event`);
+                }
+            } catch (error) {
+                console.error(`Error ${isEdit ? 'updating' : 'creating'} event:`, error);
+                showNotification('error', error.message || `Failed to ${isEdit ? 'update' : 'create'} event. Please try again.`);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        }
+
+        // Reset Event Form
+        function resetEventForm() {
+            document.getElementById('createEventForm').reset();
+            document.getElementById('eventId').value = '';
+            document.getElementById('formTitle').textContent = 'Create Your Event';
+            document.getElementById('formSubtitle').textContent = 'Bring your vision to life and connect with your audience';
+            
+            const submitBtn = document.getElementById('eventSubmitBtn');
+            if (submitBtn) {
+                submitBtn.textContent = 'Create Event';
+            }
+            
+            // Reset tickets and vendors to default
+            const ticketTypes = document.getElementById('ticketTypes');
+            ticketTypes.innerHTML = '';
+            addTicketType();
+            
+            const vendorList = document.getElementById('vendorList');
+            vendorList.innerHTML = '';
+            addVendor();
+            
+            // Reset group booking
+            const enableGroupBooking = document.getElementById('enableGroupBooking');
+            const groupBookingOptions = document.getElementById('groupBookingOptions');
+            if (enableGroupBooking) enableGroupBooking.checked = false;
+            if (groupBookingOptions) groupBookingOptions.style.display = 'none';
+        }
+
+        // Helper function to show notifications
+        function showNotification(type, message) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            const container = document.getElementById('notificationContainer') || document.body;
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Register for Event
+        async function registerForEvent(eventId) {
+            if (!window.API || !window.API.isAuthenticated()) {
+                alert('Please login to register for events');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const response = await window.API.events.register(eventId);
+                if (response.success) {
+                    showNotification('success', 'Successfully registered for event!');
+                    loadEvents();
+                }
+            } catch (error) {
+                showNotification('error', error.message || 'Failed to register for event');
+            }
+        }
+
+        // Delete Event
+        async function deleteEvent(eventId) {
+            if (!confirm('Are you sure you want to delete this event?')) return;
+
+            try {
+                const response = await window.API.events.delete(eventId);
+                if (response.success) {
+                    showNotification('success', 'Event deleted successfully!');
+                    loadDashboard();
+                    loadEvents();
+                    loadHeroStats();
+                }
+            } catch (error) {
+                showNotification('error', error.message || 'Failed to delete event');
+            }
+        }
+
+        // Edit Event
+        async function editEvent(eventId) {
+            if (!window.API || !window.API.isAuthenticated()) {
+                alert('Please login to edit events');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                // Load event data
+                const response = await window.API.events.getById(eventId);
+                if (!response.success || !response.data) {
+                    throw new Error('Event not found');
+                }
+
+                const event = response.data;
+
+                // Update form title and button
+                document.getElementById('formTitle').textContent = 'Edit Event';
+                document.getElementById('formSubtitle').textContent = 'Update your event details';
+                const submitBtn = document.getElementById('eventSubmitBtn');
+                if (submitBtn) {
+                    submitBtn.textContent = 'Update Event';
+                }
+                
+                // Set event ID
+                document.getElementById('eventId').value = event._id;
+
+                // Populate basic fields
+                document.getElementById('eventTitle').value = event.title || '';
+                document.getElementById('eventCategory').value = event.category || '';
+                document.getElementById('eventDescription').value = event.description || '';
+
+                // Format dates for datetime-local input
+                const startDate = new Date(event.startDate);
+                const endDate = new Date(event.endDate);
+                document.getElementById('eventStartDate').value = formatDateTimeLocal(startDate);
+                document.getElementById('eventEndDate').value = formatDateTimeLocal(endDate);
+
+                // Parse address (assuming format: "address, city, state")
+                const addressParts = (event.address || '').split(',').map(s => s.trim());
+                document.getElementById('venueName').value = event.location || '';
+                document.getElementById('venueAddress').value = addressParts[0] || '';
+                document.getElementById('venueCity').value = addressParts[1] || '';
+                document.getElementById('venueState').value = addressParts[2] || '';
+
+                // Populate tickets
+                const ticketTypesContainer = document.getElementById('ticketTypes');
+                ticketTypesContainer.innerHTML = '';
+                if (event.tickets && event.tickets.length > 0) {
+                    event.tickets.forEach(ticket => {
+                        addTicketType(ticket.name || '', ticket.price || 0, ticket.quantity || 0);
+                    });
+                } else {
+                    addTicketType();
+                }
+
+                // Populate vendors
+                const vendorListContainer = document.getElementById('vendorList');
+                vendorListContainer.innerHTML = '';
+                if (event.vendors && event.vendors.length > 0) {
+                    event.vendors.forEach(vendor => {
+                        addVendor(vendor.name || '', vendor.contact || '', vendor.description || '');
+                    });
+                } else {
+                    addVendor();
+                }
+
+                // Navigate to create section
+                document.querySelector('[data-page="create"]').click();
+
+                // Scroll to form
+                setTimeout(() => {
+                    document.getElementById('createEventForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+
+            } catch (error) {
+                console.error('Error loading event for editing:', error);
+                showNotification('error', 'Failed to load event. Please try again.');
+            }
+        }
+
+        // Format date for datetime-local input
+        function formatDateTimeLocal(date) {
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            const hours = String(d.getHours()).padStart(2, '0');
+            const minutes = String(d.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        // Add Ticket Type
+        function addTicketType(name = '', price = '', quantity = '') {
+            const ticketTypes = document.getElementById('ticketTypes');
+            const ticketDiv = document.createElement('div');
+            ticketDiv.className = 'ticket-type';
+            ticketDiv.innerHTML = `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ticket Type</label>
+                        <input type="text" class="ticketName" placeholder="e.g., General Admission" value="${name}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Price (₹)</label>
+                        <input type="number" class="ticketPrice" min="0" step="0.01" value="${price}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" class="ticketQuantity" min="1" value="${quantity}" required>
+                    </div>
+                    <button type="button" class="btn-remove-ticket"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            ticketTypes.appendChild(ticketDiv);
+        }
+
+        // Add Vendor
+        function addVendor(name = '', contact = '', type = '') {
+            const vendorList = document.getElementById('vendorList');
+            const vendorDiv = document.createElement('div');
+            vendorDiv.className = 'vendor-item';
+            vendorDiv.innerHTML = `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Vendor Type</label>
+                        <select class="vendorType" required>
+                            <option value="">Select Type</option>
+                            <option value="catering" ${type === 'catering' ? 'selected' : ''}>Catering</option>
+                            <option value="photography" ${type === 'photography' ? 'selected' : ''}>Photography</option>
+                            <option value="audio" ${type === 'audio' ? 'selected' : ''}>Audio/Visual</option>
+                            <option value="decoration" ${type === 'decoration' ? 'selected' : ''}>Decoration</option>
+                            <option value="security" ${type === 'security' ? 'selected' : ''}>Security</option>
+                            <option value="entertainment" ${type === 'entertainment' ? 'selected' : ''}>Entertainment</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Vendor Name</label>
+                        <input type="text" class="vendorName" value="${name}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact</label>
+                        <input type="text" class="vendorContact" value="${contact}" required>
+                    </div>
+                    <button type="button" class="btn-remove-vendor"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            vendorList.appendChild(vendorDiv);
+        }
+
+        // Update Authentication UI
+        function updateAuthUI() {
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const userName = document.getElementById('userName');
+            
+            if (window.API && window.API.isAuthenticated()) {
+                const user = window.API.getCurrentUser();
+                if (user) {
+                    if (authButtons) authButtons.style.display = 'none';
+                    if (userMenu) userMenu.style.display = 'flex';
+                    if (userName) userName.textContent = user.name || user.email;
+                }
+            } else {
+                if (authButtons) authButtons.style.display = 'flex';
+                if (userMenu) userMenu.style.display = 'none';
+            }
+        }
+
+        // Handle Logout
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.API.clearAuthData();
+                updateAuthUI();
+                showNotification('success', 'Logged out successfully!');
+                
+                // Reload page data
+                loadHeroStats();
+                loadEvents();
+                
+                // Clear dashboard
+                const dashboardEvents = document.getElementById('dashboardEvents');
+                if (dashboardEvents) {
+                    dashboardEvents.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-plus"></i>
+                            <h3>No events yet</h3>
+                            <p>Create your first event to get started</p>
+                            <a href="login.html" class="btn-primary" style="text-decoration: none; display: inline-block; margin-top: 1rem;">
+                                <i class="fas fa-sign-in-alt"></i> Login to Continue
+                            </a>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Open Reminder Modal
+        async function openReminderModal() {
+            const reminderModal = document.getElementById('reminderModal');
+            const reminderEventSelect = document.getElementById('reminderEvent');
+            
+            if (!reminderModal || !reminderEventSelect) return;
+
+            try {
+                // Load user's events and registrations
+                const [myEventsRes, myRegistrationsRes] = await Promise.all([
+                    window.API.events.getMyEvents(),
+                    window.API.events.getMyRegistrations()
+                ]);
+
+                const allEvents = [
+                    ...(myEventsRes.success && myEventsRes.data ? myEventsRes.data : []),
+                    ...(myRegistrationsRes.success && myRegistrationsRes.data ? myRegistrationsRes.data : [])
+                ];
+
+                // Remove duplicates
+                const uniqueEvents = allEvents.filter((event, index, self) =>
+                    index === self.findIndex(e => e._id === event._id)
+                );
+
+                // Populate event select
+                reminderEventSelect.innerHTML = '<option value="">Select an event</option>';
+                uniqueEvents.forEach(event => {
+                    const option = document.createElement('option');
+                    option.value = event._id;
+                    option.textContent = `${event.title} - ${new Date(event.startDate).toLocaleDateString()}`;
+                    reminderEventSelect.appendChild(option);
+                });
+
+                reminderModal.style.display = 'flex';
+                reminderModal.classList.add('active');
+            } catch (error) {
+                console.error('Error loading events for reminder:', error);
+                showNotification('error', 'Failed to load events. Please try again.');
+            }
+        }
+
+        // Handle Reminder Submit
+        async function handleReminderSubmit(e) {
+            e.preventDefault();
+
+            const eventId = document.getElementById('reminderEvent').value;
+            const reminderDateTime = document.getElementById('reminderDateTime').value;
+            const reminderMessage = document.getElementById('reminderMessage').value;
+
+            if (!eventId || !reminderDateTime || !reminderMessage) {
+                showNotification('error', 'Please fill in all fields');
+                return;
+            }
+
+            try {
+                // Get event details
+                const eventResponse = await window.API.events.getById(eventId);
+                if (!eventResponse.success) {
+                    throw new Error('Event not found');
+                }
+
+                const event = eventResponse.data;
+
+                // Create reminder object
+                const reminder = {
+                    id: Date.now().toString(),
+                    eventId: eventId,
+                    eventTitle: event.title,
+                    eventDate: event.startDate,
+                    reminderDateTime: reminderDateTime,
+                    message: reminderMessage,
+                    createdAt: new Date().toISOString(),
+                    notified: false
+                };
+
+                // Save to localStorage
+                const reminders = getReminders();
+                reminders.push(reminder);
+                saveReminders(reminders);
+
+                // Close modal and reset form
+                const modal = document.getElementById('reminderModal');
+                modal.style.display = 'none';
+                modal.classList.remove('active');
+                e.target.reset();
+
+                showNotification('success', 'Reminder set successfully!');
+                loadReminders();
+
+                // Schedule notification check
+                scheduleReminderCheck();
+            } catch (error) {
+                console.error('Error setting reminder:', error);
+                showNotification('error', 'Failed to set reminder. Please try again.');
+            }
+        }
+
+        // Get Reminders from localStorage
+        function getReminders() {
+            const reminders = localStorage.getItem('eventReminders');
+            return reminders ? JSON.parse(reminders) : [];
+        }
+
+        // Save Reminders to localStorage
+        function saveReminders(reminders) {
+            localStorage.setItem('eventReminders', JSON.stringify(reminders));
+        }
+
+        // Load and Display Reminders
+        function loadReminders() {
+            const remindersList = document.getElementById('remindersList');
+            if (!remindersList) return;
+
+            const reminders = getReminders();
+            const user = window.API ? window.API.getCurrentUser() : null;
+
+            if (!user) {
+                remindersList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <h3>No reminders set</h3>
+                        <p>Please login to set reminders</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (reminders.length === 0) {
+                remindersList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <h3>No reminders set</h3>
+                        <p>Create reminders to stay on top of your events</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort reminders by date
+            reminders.sort((a, b) => new Date(a.reminderDateTime) - new Date(b.reminderDateTime));
+
+            remindersList.innerHTML = '';
+            reminders.forEach(reminder => {
+                const reminderItem = document.createElement('div');
+                reminderItem.className = 'reminder-item';
+                
+                const reminderDate = new Date(reminder.reminderDateTime);
+                const eventDate = new Date(reminder.eventDate);
+                const isPast = reminderDate < new Date();
+                
+                reminderItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                        <div>
+                            <h4 style="color: var(--primary); margin-bottom: 0.25rem; font-size: 1.1rem;">${reminder.eventTitle}</h4>
+                            <p style="color: var(--dark-alt); font-size: 0.9rem; margin-bottom: 0.5rem;">${reminder.message}</p>
+                        </div>
+                        <button class="btn-action btn-danger" onclick="deleteReminder('${reminder.id}')" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 1.5rem; font-size: 0.85rem; color: var(--dark-alt);">
+                        <span><i class="fas fa-bell"></i> Reminder: ${reminderDate.toLocaleString()}</span>
+                        <span><i class="fas fa-calendar"></i> Event: ${eventDate.toLocaleDateString()}</span>
+                        ${isPast ? '<span style="color: var(--danger);"><i class="fas fa-exclamation-circle"></i> Past</span>' : ''}
+                    </div>
+                `;
+                remindersList.appendChild(reminderItem);
+            });
+        }
+
+        // Delete Reminder
+        function deleteReminder(reminderId) {
+            if (!confirm('Are you sure you want to delete this reminder?')) return;
+
+            const reminders = getReminders();
+            const filtered = reminders.filter(r => r.id !== reminderId);
+            saveReminders(filtered);
+            loadReminders();
+            showNotification('success', 'Reminder deleted successfully!');
+        }
+
+        // Schedule Reminder Check
+        function scheduleReminderCheck() {
+            const reminders = getReminders();
+            const now = new Date();
+
+            reminders.forEach(reminder => {
+                const reminderDate = new Date(reminder.reminderDateTime);
+                
+                // Check if reminder time has passed and not yet notified
+                if (reminderDate <= now && !reminder.notified) {
+                    // Show browser notification if supported
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification(`Reminder: ${reminder.eventTitle}`, {
+                            body: reminder.message,
+                            icon: '/favicon.ico'
+                        });
+                    } else if ('Notification' in window && Notification.permission !== 'denied') {
+                        Notification.requestPermission().then(permission => {
+                            if (permission === 'granted') {
+                                new Notification(`Reminder: ${reminder.eventTitle}`, {
+                                    body: reminder.message,
+                                    icon: '/favicon.ico'
+                                });
+                            }
+                        });
+                    }
+
+                    // Show in-app notification
+                    showNotification('info', `Reminder: ${reminder.eventTitle} - ${reminder.message}`);
+
+                    // Mark as notified
+                    reminder.notified = true;
+                }
+            });
+
+            // Save updated reminders
+            saveReminders(reminders);
+        }
+
+        // Check reminders every minute
+        setInterval(scheduleReminderCheck, 60000);
+
+        // Request notification permission on page load
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    </script>
+</body>
+</html>

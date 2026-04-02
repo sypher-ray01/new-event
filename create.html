@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventHub - Create Event</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body data-page="create">
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand"><i class="fas fa-calendar-alt"></i><span>EventHub</span></div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="events.html" class="nav-link">Events</a></li>
+                <li><a href="create.html" class="nav-link active">Create Event</a></li>
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn-notification" id="notificationBtn"><i class="fas fa-bell"></i><span class="notification-badge" id="notificationBadge">0</span></button>
+                <button class="btn-primary" id="loginBtn">Login</button>
+            </div>
+        </nav>
+    </header>
+
+    <section class="create-event-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Create Your Event</h2>
+                <p>Bring your vision to life</p>
+            </div>
+            <form class="event-form reveal" id="createEventForm">
+                <div class="form-row">
+                    <div class="form-group"><label>Event Title *</label><input type="text" id="eventTitle" required></div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="eventCategory" required>
+                            <option value="music">Music & Concerts</option>
+                            <option value="business">Business</option>
+                            <option value="tech">Technology</option>
+                            <option value="sports">Sports</option>
+                            <option value="food">Food & Drink</option>
+                            <option value="art">Arts & Culture</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group"><label>Description *</label><textarea id="eventDescription" rows="4" required></textarea></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Start *</label><input type="datetime-local" id="eventStartDate" required></div>
+                    <div class="form-group"><label>End *</label><input type="datetime-local" id="eventEndDate" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Venue</label><input type="text" id="venueName" required></div>
+                    <div class="form-group"><label>City</label><input type="text" id="venueCity" required></div>
+                    <div class="form-group"><label>Address</label><input type="text" id="venueAddress" required></div>
+                    <div class="form-group"><label>State</label><input type="text" id="venueState" required></div>
+                </div>
+
+                <div class="ticketing-section">
+                    <h3>Ticket Configuration</h3>
+                    <div id="ticketTypes"></div>
+                    <button type="button" class="btn-add-ticket" id="addTicketType"><i class="fas fa-plus"></i> Add Ticket Type</button>
+                </div>
+
+                <div class="vendor-section">
+                    <h3>Vendors</h3>
+                    <div id="vendorList"></div>
+                    <button type="button" class="btn-add-vendor" id="addVendor"><i class="fas fa-plus"></i> Add Vendor</button>
+                </div>
+                
+                 <div class="group-booking-section">
+                    <h3>Group Booking</h3>
+                    <div class="form-group">
+                        <label class="checkbox-label"><input type="checkbox" id="enableGroupBooking"> Enable Group Discounts</label>
+                    </div>
+                     <div id="groupBookingOptions" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group"><label>Min Size</label><input type="number" id="groupMinSize" value="5"></div>
+                            <div class="form-group"><label>Discount %</label><input type="number" id="groupDiscount" value="10"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">Create Event</button>
+            </form>
+        </div>
+    </section>
+    
+    <div class="notification-panel" id="notificationPanel">
+        <div class="panel-header"><h3>Notifications</h3><button id="closeNotificationPanel">&times;</button></div>
+        <div class="notifications-list" id="notificationsList"></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/standalone.js"></script>
+</body>
+</html>

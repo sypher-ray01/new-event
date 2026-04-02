@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventHub - Premier Event Management Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Page separation styles */
+        .page-section {
+            display: none;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-calendar-alt"></i>
+                <span>EventHub</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active" data-page="home">Home</a></li>
+                <li><a href="#events" class="nav-link" data-page="events">Events</a></li>
+                <li><a href="#create" class="nav-link" data-page="create">Create Event</a></li>
+                <li><a href="#dashboard" class="nav-link" data-page="dashboard">Dashboard</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn-notification" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge">3</span>
+                </button>
+                <button class="btn-primary" id="loginBtn">Login</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section (HOME PAGE) -->
+    <section id="home" class="hero page-section active">
+        <div class="hero-content">
+            <h1 class="hero-title">Discover Amazing Events Near You</h1>
+            <p class="hero-subtitle">Connect, explore, and create unforgettable experiences</p>
+            <div class="hero-search">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="heroSearch" placeholder="Search for events, categories, or locations...">
+                </div>
+                <button class="btn-search" id="heroSearchBtn">Search</button>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <h3>2,500+</h3>
+                    <p>Active Events</p>
+                </div>
+                <div class="stat-item">
+                    <h3>50K+</h3>
+                    <p>Happy Attendees</p>
+                </div>
+                <div class="stat-item">
+                    <h3>1,200+</h3>
+                    <p>Event Organizers</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advanced Search & Filter Section (EVENTS PAGE) -->
+    <section id="events" class="events-section page-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Explore Events</h2>
+                <p>Find the perfect event tailored to your interests</p>
+            </div>
+
+            <!-- Advanced Filters -->
+            <div class="filters-panel">
+                <div class="filter-group">
+                    <label><i class="fas fa-tag"></i> Category</label>
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="music">Music & Concerts</option>
+                        <option value="business">Business & Professional</option>
+                        <option value="tech">Technology</option>
+                        <option value="sports">Sports & Fitness</option>
+                        <option value="food">Food & Drink</option>
+                        <option value="art">Arts & Culture</option>
+                        <option value="education">Education</option>
+                        <option value="charity">Charity & Causes</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-calendar"></i> Date Range</label>
+                    <input type="date" id="startDate">
+                    <input type="date" id="endDate">
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Location</label>
+                    <input type="text" id="locationFilter" placeholder="City or venue...">
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-rupee-sign"></i> Price Range</label>
+                    <div class="price-range">
+                        <input type="number" id="minPrice" placeholder="Min" min="0">
+                        <span>-</span>
+                        <input type="number" id="maxPrice" placeholder="Max" min="0">
+                    </div>
+                </div>
+                <button class="btn-filter" id="applyFilters">Apply Filters</button>
+                <button class="btn-reset" id="resetFilters">Reset</button>
+            </div>
+
+            <!-- Events Grid -->
+            <div class="events-grid" id="eventsGrid"></div>
+        </div>
+    </section>
+
+    <!-- Create Event Section (CREATE EVENT PAGE) -->
+    <section id="create" class="create-event-section page-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Create Your Event</h2>
+                <p>Bring your vision to life and connect with your audience</p>
+            </div>
+            <form class="event-form" id="createEventForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Event Title *</label>
+                        <input type="text" id="eventTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="eventCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="music">Music & Concerts</option>
+                            <option value="business">Business & Professional</option>
+                            <option value="tech">Technology</option>
+                            <option value="sports">Sports & Fitness</option>
+                            <option value="food">Food & Drink</option>
+                            <option value="art">Arts & Culture</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea id="eventDescription" rows="4" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Start Date & Time *</label>
+                        <input type="datetime-local" id="eventStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Date & Time *</label>
+                        <input type="datetime-local" id="eventEndDate" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Venue Name *</label>
+                        <input type="text" id="venueName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Address *</label>
+                        <input type="text" id="venueAddress" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>City *</label>
+                        <input type="text" id="venueCity" required>
+                    </div>
+                    <div class="form-group">
+                        <label>State/Province *</label>
+                        <input type="text" id="venueState" required>
+                    </div>
+                </div>
+
+                <!-- Ticketing Section -->
+                <div class="ticketing-section">
+                    <h3>Ticket Configuration</h3>
+                    <div id="ticketTypes">
+                        <div class="ticket-type">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Ticket Type</label>
+                                    <input type="text" class="ticketName" placeholder="e.g., General Admission" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Price (₹)</label>
+                                    <input type="number" class="ticketPrice" min="0" step="0.01" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Quantity</label>
+                                    <input type="number" class="ticketQuantity" min="1" required>
+                                </div>
+                                <button type="button" class="btn-remove-ticket"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-add-ticket" id="addTicketType">
+                        <i class="fas fa-plus"></i> Add Ticket Type
+                    </button>
+                </div>
+
+                <!-- Vendor Details Section -->
+                <div class="vendor-section">
+                    <h3>Vendor & Service Providers</h3>
+                    <div id="vendorList">
+                        <div class="vendor-item">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Vendor Type</label>
+                                    <select class="vendorType" required>
+                                        <option value="">Select Type</option>
+                                        <option value="catering">Catering</option>
+                                        <option value="photography">Photography</option>
+                                        <option value="audio">Audio/Visual</option>
+                                        <option value="decoration">Decoration</option>
+                                        <option value="security">Security</option>
+                                        <option value="entertainment">Entertainment</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Vendor Name</label>
+                                    <input type="text" class="vendorName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Contact</label>
+                                    <input type="text" class="vendorContact" required>
+                                </div>
+                                <button type="button" class="btn-remove-vendor"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-add-vendor" id="addVendor">
+                        <i class="fas fa-plus"></i> Add Vendor
+                    </button>
+                </div>
+
+                <!-- Group Booking Options -->
+                <div class="group-booking-section">
+                    <h3>Group Booking Options</h3>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="enableGroupBooking">
+                            Enable Group Bookings with Discounts
+                        </label>
+                    </div>
+                    <div id="groupBookingOptions" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Minimum Group Size</label>
+                                <input type="number" id="groupMinSize" min="2" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label>Discount Percentage</label>
+                                <input type="number" id="groupDiscount" min="1" max="50" value="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">Create Event</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Dashboard Section (DASHBOARD PAGE) -->
+    <section id="dashboard" class="dashboard-section page-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Event Dashboard</h2>
+                <p>Manage your events and track performance</p>
+            </div>
+            
+            <div class="dashboard-tabs">
+                <button class="tab-btn active" data-tab="myEvents">My Events</button>
+                <button class="tab-btn" data-tab="bookings">My Bookings</button>
+                <button class="tab-btn" data-tab="attendees">Attendee Management</button>
+                <button class="tab-btn" data-tab="reminders">Reminders</button>
+            </div>
+
+            <div class="tab-content active" id="myEvents">
+                <div class="dashboard-events" id="dashboardEvents"></div>
+            </div>
+
+            <div class="tab-content" id="bookings">
+                <div class="bookings-list" id="bookingsList"></div>
+            </div>
+
+            <div class="tab-content" id="attendees">
+                <div class="attendees-panel">
+                    <div class="attendee-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-users"></i>
+                            <h3 id="totalAttendees">0</h3>
+                            <p>Total Attendees</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle"></i>
+                            <h3 id="checkedIn">0</h3>
+                            <p>Checked In</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <h3 id="pending">0</h3>
+                            <p>Pending</p>
+                        </div>
+                    </div>
+                    <div class="attendees-list" id="attendeesList"></div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="reminders">
+                <div class="reminders-panel">
+                    <button class="btn-add-reminder" id="addReminderBtn">
+                        <i class="fas fa-plus"></i> Add Reminder
+                    </button>
+                    <div class="reminders-list" id="remindersList"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Event Detail Modal -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content event-detail">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <div id="eventDetailContent"></div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content booking-form">
+            <button class="modal-close" id="closeBookingModal">&times;</button>
+            <h2>Complete Your Booking</h2>
+            <form id="bookingForm">
+                <div id="bookingContent"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reminder Modal -->
+    <div class="modal" id="reminderModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeReminderModal">&times;</button>
+            <h2>Set Event Reminder</h2>
+            <form id="reminderForm">
+                <div class="form-group">
+                    <label>Select Event</label>
+                    <select id="reminderEvent" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Reminder Date & Time</label>
+                    <input type="datetime-local" id="reminderDateTime" required>
+                </div>
+                <div class="form-group">
+                    <label>Reminder Message</label>
+                    <textarea id="reminderMessage" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Set Reminder</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="panel-header">
+            <h3>Notifications</h3>
+            <button id="closeNotificationPanel">&times;</button>
+        </div>
+        <div class="notifications-list" id="notificationsList"></div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Page navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.page-section');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links and sections
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    sections.forEach(s => s.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Show corresponding section
+                    const pageId = this.getAttribute('data-page');
+                    const targetSection = document.getElementById(pageId);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                    }
+                    
+                    // Scroll to top
+                    window.scrollTo(0, 0);
+                });
+            });
+            
+            // Handle hash navigation on page load
+            if (window.location.hash) {
+                const hash = window.location.hash.substring(1);
+                const targetLink = document.querySelector(`[data-page="${hash}"]`);
+                if (targetLink) {
+                    targetLink.click();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

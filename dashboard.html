@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventHub - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body data-page="dashboard">
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand"><i class="fas fa-calendar-alt"></i><span>EventHub</span></div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="events.html" class="nav-link">Events</a></li>
+                <li><a href="create.html" class="nav-link">Create Event</a></li>
+                <li><a href="dashboard.html" class="nav-link active">Dashboard</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn-notification" id="notificationBtn"><i class="fas fa-bell"></i><span class="notification-badge" id="notificationBadge">0</span></button>
+                <button class="btn-primary" id="loginBtn">Login</button>
+            </div>
+        </nav>
+    </header>
+
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Event Dashboard</h2>
+                <p>Manage your events and track performance</p>
+            </div>
+
+            <div class="dashboard-tabs">
+                <button class="tab-btn active" data-tab="myEvents">My Events</button>
+                <button class="tab-btn" data-tab="bookings">My Bookings</button>
+                <button class="tab-btn" data-tab="attendees">Attendee Management</button>
+                <button class="tab-btn" data-tab="reminders">Reminders</button>
+            </div>
+
+            <div class="tab-content active reveal" id="myEvents"><div class="dashboard-events" id="dashboardEvents"></div></div>
+            <div class="tab-content" id="bookings"><div class="bookings-list" id="bookingsList"></div></div>
+            
+            <div class="tab-content" id="attendees">
+                <div class="attendees-panel">
+                    <div class="attendee-stats">
+                        <div class="stat-card"><i class="fas fa-users"></i><h3 id="totalAttendees">0</h3><p>Total</p></div>
+                        <div class="stat-card"><i class="fas fa-check-circle"></i><h3 id="checkedIn">0</h3><p>Checked In</p></div>
+                        <div class="stat-card"><i class="fas fa-clock"></i><h3 id="pending">0</h3><p>Pending</p></div>
+                    </div>
+                    <div class="attendees-list" id="attendeesList"></div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="reminders">
+                <div class="reminders-panel">
+                    <button class="btn-add-reminder" id="addReminderBtn"><i class="fas fa-plus"></i> Add Reminder</button>
+                    <div class="reminders-list" id="remindersList"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="modal" id="reminderModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeReminderModal">&times;</button>
+            <h2>Set Reminder</h2>
+            <form id="reminderForm">
+                <div class="form-group"><label>Select Event</label><select id="reminderEvent" required></select></div>
+                <div class="form-group"><label>Date & Time</label><input type="datetime-local" id="reminderDateTime" required></div>
+                <div class="form-group"><label>Message</label><textarea id="reminderMessage" rows="3" required></textarea></div>
+                <button type="submit" class="btn-submit">Set Reminder</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="notification-panel" id="notificationPanel">
+        <div class="panel-header"><h3>Notifications</h3><button id="closeNotificationPanel">&times;</button></div>
+        <div class="notifications-list" id="notificationsList"></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/standalone.js"></script>
+</body>
+</html>
