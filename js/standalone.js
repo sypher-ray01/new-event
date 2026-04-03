@@ -12,6 +12,16 @@
     attendeeEventId: null
   };
 
+  function escapeHtml(str) {
+    const value = String(str == null ? '' : str);
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     bindSharedUi();
 
@@ -194,20 +204,20 @@
     grid.innerHTML = state.events.map((event) => {
       const attendees = event.attendeesCount || (Array.isArray(event.attendees) ? event.attendees.length : 0);
       return `
-        <div class="event-card" onclick="openEventDetail('${event._id}')">
+        <div class="event-card" onclick="openEventDetail('${escapeHtml(event._id)}')">
           <div class="event-image"><i class="fas ${getCategoryIcon(event.category)}"></i></div>
           <div class="event-content">
-            <span class="event-category">${formatCategory(event.category)}</span>
-            <h3 class="event-title">${event.title}</h3>
+            <span class="event-category">${escapeHtml(formatCategory(event.category))}</span>
+            <h3 class="event-title">${escapeHtml(event.title)}</h3>
             <div class="event-meta">
-              <div class="event-meta-item"><i class="fas fa-calendar"></i><span>${formatDate(event.startDate)}</span></div>
-              <div class="event-meta-item"><i class="fas fa-clock"></i><span>${formatTime(event.startDate)}</span></div>
-              <div class="event-meta-item"><i class="fas fa-map-marker-alt"></i><span>${event.venue.city}</span></div>
+              <div class="event-meta-item"><i class="fas fa-calendar"></i><span>${escapeHtml(formatDate(event.startDate))}</span></div>
+              <div class="event-meta-item"><i class="fas fa-clock"></i><span>${escapeHtml(formatTime(event.startDate))}</span></div>
+              <div class="event-meta-item"><i class="fas fa-map-marker-alt"></i><span>${escapeHtml(event.venue.city)}</span></div>
               <div class="event-meta-item"><i class="fas fa-users"></i><span>${attendees} attendees</span></div>
             </div>
             <div class="event-footer">
               <span class="event-price">₹${Number(event.price || 0)}</span>
-              <button class="btn-book" onclick="event.stopPropagation(); openBookingModal('${event._id}')">Book Now</button>
+              <button class="btn-book" onclick="event.stopPropagation(); openBookingModal('${escapeHtml(event._id)}')">Book Now</button>
             </div>
           </div>
         </div>
@@ -259,17 +269,17 @@
       return `
         <div class="dashboard-event-card">
           <div class="dashboard-event-info">
-            <h3>${event.title}</h3>
-            <p>${formatDateTime(event.startDate)}</p>
+            <h3>${escapeHtml(event.title)}</h3>
+            <p>${escapeHtml(formatDateTime(event.startDate))}</p>
             <div class="dashboard-event-stats">
               <span><i class="fas fa-users"></i> ${attendees}</span>
               <span><i class="fas fa-indian-rupee-sign"></i> ${revenue.toFixed(2)}</span>
             </div>
           </div>
           <div class="dashboard-event-actions">
-            <button class="btn-action" onclick="openEventDetail('${event._id}')">View</button>
-            <button class="btn-action" onclick="showAttendees('${event._id}')">Attendees</button>
-            <button class="btn-action btn-danger" onclick="deleteEvent('${event._id}')">Delete</button>
+            <button class="btn-action" onclick="openEventDetail('${escapeHtml(event._id)}')">View</button>
+            <button class="btn-action" onclick="showAttendees('${escapeHtml(event._id)}')">Attendees</button>
+            <button class="btn-action btn-danger" onclick="deleteEvent('${escapeHtml(event._id)}')">Delete</button>
           </div>
         </div>
       `;
@@ -288,14 +298,14 @@
     container.innerHTML = state.bookings.map((booking) => `
       <div class="booking-card">
         <div class="booking-card-header">
-          <h3>${booking.eventTitle}</h3>
-          <span class="booking-status confirmed">${booking.status}</span>
+          <h3>${escapeHtml(booking.eventTitle)}</h3>
+          <span class="booking-status confirmed">${escapeHtml(booking.status)}</span>
         </div>
         <div class="booking-details">
-          <p>Booked on: ${formatDate(booking.bookingDate)}</p>
+          <p>Booked on: ${escapeHtml(formatDate(booking.bookingDate))}</p>
           <p>Total: ₹${Number(booking.total || 0).toFixed(2)}</p>
         </div>
-        <button class="btn-action btn-danger" onclick="cancelBooking('${booking._id}')">Cancel</button>
+        <button class="btn-action btn-danger" onclick="cancelBooking('${escapeHtml(booking._id)}')">Cancel</button>
       </div>
     `).join("");
   }
@@ -312,11 +322,11 @@
     container.innerHTML = state.reminders.map((reminder) => `
       <div class="reminder-item">
         <div class="reminder-header">
-          <div class="reminder-title">${reminder.eventTitle}</div>
-          <button class="btn-delete-reminder" onclick="deleteReminder('${reminder._id}')"><i class="fas fa-trash"></i></button>
+          <div class="reminder-title">${escapeHtml(reminder.eventTitle)}</div>
+          <button class="btn-delete-reminder" onclick="deleteReminder('${escapeHtml(reminder._id)}')"><i class="fas fa-trash"></i></button>
         </div>
-        <div class="reminder-message">${reminder.message}</div>
-        <small>${formatDateTime(reminder.remindAt)}</small>
+        <div class="reminder-message">${escapeHtml(reminder.message)}</div>
+        <small>${escapeHtml(formatDateTime(reminder.remindAt))}</small>
       </div>
     `).join("");
   }
@@ -351,13 +361,13 @@
     container.innerHTML = attendees.map((attendee) => `
       <div class="booking-card">
         <div class="booking-card-header">
-          <h3>${attendee.name}</h3>
-          <span class="booking-status confirmed">${attendee.status}</span>
+          <h3>${escapeHtml(attendee.name)}</h3>
+          <span class="booking-status confirmed">${escapeHtml(attendee.status)}</span>
         </div>
         <div class="booking-details">
-          <p>Email: ${attendee.email}</p>
-          <p>Phone: ${attendee.phone}</p>
-          <p>Booked: ${formatDate(attendee.bookingDate)}</p>
+          <p>Email: ${escapeHtml(attendee.email)}</p>
+          <p>Phone: ${escapeHtml(attendee.phone)}</p>
+          <p>Booked: ${escapeHtml(formatDate(attendee.bookingDate))}</p>
         </div>
       </div>
     `).join("");
@@ -472,7 +482,7 @@
 
     select.innerHTML =
       '<option value="">Select Event</option>' +
-      uniqueEvents.map((event) => `<option value="${event._id}">${event.title}</option>`).join("");
+      uniqueEvents.map((event) => `<option value="${escapeHtml(event._id)}">${escapeHtml(event.title)}</option>`).join("");
     modal.classList.add("active");
   }
 
@@ -486,20 +496,20 @@
 
       content.innerHTML = `
         <div class="event-detail-header">
-          <span class="event-category">${formatCategory(event.category)}</span>
-          <h2 class="event-detail-title">${event.title}</h2>
-          <p>${event.description}</p>
+          <span class="event-category">${escapeHtml(formatCategory(event.category))}</span>
+          <h2 class="event-detail-title">${escapeHtml(event.title)}</h2>
+          <p>${escapeHtml(event.description)}</p>
         </div>
         <div class="event-detail-section">
           <h3><i class="fas fa-calendar-alt"></i> Date & Time</h3>
-          <p><strong>Start:</strong> ${formatDateTime(event.startDate)}</p>
-          <p><strong>End:</strong> ${formatDateTime(event.endDate)}</p>
+          <p><strong>Start:</strong> ${escapeHtml(formatDateTime(event.startDate))}</p>
+          <p><strong>End:</strong> ${escapeHtml(formatDateTime(event.endDate))}</p>
         </div>
         <div class="event-detail-section">
           <h3><i class="fas fa-map-marker-alt"></i> Location</h3>
-          <p><strong>${event.venue.name}</strong></p>
-          <p>${event.venue.address}</p>
-          <p>${event.venue.city}, ${event.venue.state}</p>
+          <p><strong>${escapeHtml(event.venue.name)}</strong></p>
+          <p>${escapeHtml(event.venue.address)}</p>
+          <p>${escapeHtml(event.venue.city)}, ${escapeHtml(event.venue.state)}</p>
         </div>
         <div class="event-detail-section">
           <h3><i class="fas fa-ticket-alt"></i> Tickets Available</h3>
@@ -507,7 +517,7 @@
             ${(event.tickets || []).map((ticket) => `
               <div class="ticket-option">
                 <div>
-                  <strong>${ticket.type}</strong>
+                  <strong>${escapeHtml(ticket.type)}</strong>
                   <p>₹${ticket.price} • ${ticket.quantity - ticket.sold} remaining</p>
                 </div>
               </div>
@@ -515,8 +525,8 @@
           </div>
         </div>
         <div style="margin-top: 2rem; display: flex; gap: 1rem;">
-          <button class="btn-submit" onclick="openBookingModal('${event._id}')">Book Tickets</button>
-          <button class="btn-action" onclick="shareEvent('${event._id}')"><i class="fas fa-share-alt"></i> Share</button>
+          <button class="btn-submit" onclick="openBookingModal('${escapeHtml(event._id)}')">Book Tickets</button>
+          <button class="btn-action" onclick="shareEvent('${escapeHtml(event._id)}')"><i class="fas fa-share-alt"></i> Share</button>
         </div>
       `;
       modal.classList.add("active");
@@ -538,21 +548,21 @@
       if (!modal || !content) return;
 
       content.innerHTML = `
-        <h3>${event.title}</h3>
-        <p style="color: var(--dark-alt); margin-bottom: 1.5rem;">${formatDateTime(event.startDate)}</p>
-        <input type="hidden" id="bookingEventId" value="${event._id}">
+        <h3>${escapeHtml(event.title)}</h3>
+        <p style="color: var(--dark-alt); margin-bottom: 1.5rem;">${escapeHtml(formatDateTime(event.startDate))}</p>
+        <input type="hidden" id="bookingEventId" value="${escapeHtml(event._id)}">
         <div class="form-group">
           <label>Select Tickets</label>
           ${(event.tickets || []).map((ticket, index) => `
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--light); border-radius: 8px; margin-bottom: 0.5rem;">
-              <div><strong>${ticket.type}</strong><p>₹${ticket.price}</p></div>
-              <input type="number" id="ticket_${index}" data-ticket-type="${ticket.type}" data-ticket-price="${ticket.price}" data-ticket-minsize="${event.groupBooking?.minSize || 5}" data-ticket-discount="${event.groupBooking?.discount || 10}" min="0" max="${ticket.quantity - ticket.sold}" value="0" style="width: 80px; padding: 0.5rem; text-align: center;" onchange="updateBookingTotal()">
+              <div><strong>${escapeHtml(ticket.type)}</strong><p>₹${ticket.price}</p></div>
+              <input type="number" id="ticket_${index}" data-ticket-type="${escapeHtml(ticket.type)}" data-ticket-price="${ticket.price}" data-ticket-minsize="${event.groupBooking?.minSize || 5}" data-ticket-discount="${event.groupBooking?.discount || 10}" min="0" max="${ticket.quantity - ticket.sold}" value="0" style="width: 80px; padding: 0.5rem; text-align: center;" onchange="updateBookingTotal()">
             </div>
           `).join("")}
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Full Name</label><input type="text" id="bookingName" value="${user.name || ""}" required></div>
-          <div class="form-group"><label>Email</label><input type="email" id="bookingEmail" value="${user.email || ""}" required></div>
+          <div class="form-group"><label>Full Name</label><input type="text" id="bookingName" value="${escapeHtml(user.name || '')}" required></div>
+          <div class="form-group"><label>Email</label><input type="email" id="bookingEmail" value="${escapeHtml(user.email || '')}" required></div>
         </div>
         <div class="form-group"><label>Phone</label><input type="tel" id="bookingPhone" required></div>
         <div style="margin-top: 1.5rem; padding: 1rem; background: var(--light); border-radius: 8px;">
@@ -695,7 +705,7 @@
 
     const notification = document.createElement("div");
     notification.className = `notification ${type}`;
-    notification.innerHTML = `<i class="fas ${type === "success" ? "fa-check-circle" : "fa-info-circle"}"></i><span>${message}</span>`;
+    notification.innerHTML = `<i class="fas ${type === "success" ? "fa-check-circle" : "fa-info-circle"}"></i><span>${escapeHtml(message)}</span>`;
     container.appendChild(notification);
 
     setTimeout(() => {

@@ -6,8 +6,10 @@ function normalizeEvent(eventDoc) {
       ? event.attendeesCount
       : 0;
 
+  const { organizer, __v, ...safeEvent } = event;
+
   return {
-    ...event,
+    ...safeEvent,
     location: event.venue?.name || "",
     address:
       event.venue?.address && event.venue?.city && event.venue?.state

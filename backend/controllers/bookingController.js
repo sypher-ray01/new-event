@@ -37,6 +37,7 @@ const createBooking = asyncHandler(async (req, res) => {
   session.startTransaction();
 
   try {
+    // First read: get event data for validation and pricing (read-only)
     const event = await Event.findById(eventId).session(session);
     if (!event) {
       throw new Error("Event not found");
@@ -45,7 +46,9 @@ const createBooking = asyncHandler(async (req, res) => {
     const bookingTickets = [];
     let subtotal = 0;
     let totalCount = 0;
+    const ticketIncrements = [];
 
+    // Validate and prepare ticket data (no writes yet)
     selectedTickets.forEach((selectedTicket) => {
       const ticketName = selectedTicket.ticketType || selectedTicket.type || selectedTicket.name;
       const quantity = Number(selectedTicket.quantity || 0);
@@ -59,12 +62,6 @@ const createBooking = asyncHandler(async (req, res) => {
         return;
       }
 
-      const available = ticket.quantity - ticket.sold;
-      if (available < quantity) {
-        throw new Error(`Not enough availability for ${ticket.type}`);
-      }
-
-      ticket.sold += quantity;
       subtotal += ticket.price * quantity;
       totalCount += quantity;
       bookingTickets.push({
@@ -72,21 +69,54 @@ const createBooking = asyncHandler(async (req, res) => {
         quantity,
         unitPrice: ticket.price
       });
+      ticketIncrements.push({ ticketName: ticket.type, quantity, maxSold: ticket.quantity - quantity });
     });
 
     if (!bookingTickets.length) {
       throw new Error("Please select at least one ticket");
     }
 
+    // ATOMIC: decrement tickets one type at a time using findOneAndUpdate.
+    // Each operation checks availability and decrements in a single atomic step.
+    // If any returns null, the ticket was already taken (lost the race).
+    for (const { ticketName, quantity, maxSold } of ticketIncrements) {
+      const updated = await Event.findOneAndUpdate(
+        {
+          _id: eventId,
+          tickets: {
+            $elemMatch: {
+              type: ticketName,
+              sold: { $lte: maxSold }
+            }
+          }
+        },
+        {
+          $inc: { "tickets.$.sold": quantity }
+        },
+        {
+          new: true,
+          session,
+          runValidators: true
+        }
+      );
+
+      if (!updated) {
+        throw new Error(`Not enough availability for ${ticketName}. Please try again.`);
+      }
+    }
+
+    // Read the final event state for group booking calculation
+    const updatedEvent = await Event.findById(eventId).session(session);
+
     let discount = 0;
-    if (event.groupBooking.enabled && totalCount >= event.groupBooking.minSize) {
-      discount = subtotal * (event.groupBooking.discount / 100);
+    if (updatedEvent.groupBooking.enabled && totalCount >= updatedEvent.groupBooking.minSize) {
+      discount = subtotal * (updatedEvent.groupBooking.discount / 100);
     }
 
     const booking = await Booking.create(
       [
         {
-          event: event._id,
+          event: updatedEvent._id,
           user: req.user._id,
           userName: userName || req.user.name,
           userEmail: userEmail || req.user.email,
@@ -100,7 +130,6 @@ const createBooking = asyncHandler(async (req, res) => {
       { session }
     );
 
-    await event.save({ session });
     await session.commitTransaction();
 
     res.status(201).json({
@@ -157,21 +186,30 @@ const cancelBooking = asyncHandler(async (req, res) => {
       });
     }
 
-    const event = await Event.findById(booking.event).session(session);
-    if (!event) {
-      throw new Error("Associated event not found");
+    // ATOMIC: restore ticket counts using findOneAndUpdate + $inc per ticket type
+    for (const bookedTicket of booking.tickets) {
+      await Event.findOneAndUpdate(
+        {
+          _id: booking.event,
+          tickets: {
+            $elemMatch: {
+              type: bookedTicket.ticketType,
+              sold: { $gte: bookedTicket.quantity }
+            }
+          }
+        },
+        {
+          $inc: { "tickets.$.sold": -bookedTicket.quantity }
+        },
+        {
+          session,
+          runValidators: true
+        }
+      );
     }
-
-    booking.tickets.forEach((bookedTicket) => {
-      const eventTicket = event.tickets.find((ticket) => ticket.type === bookedTicket.ticketType);
-      if (eventTicket) {
-        eventTicket.sold = Math.max(0, eventTicket.sold - bookedTicket.quantity);
-      }
-    });
 
     booking.status = "cancelled";
     await booking.save({ session });
-    await event.save({ session });
     await session.commitTransaction();
 
     res.status(200).json({

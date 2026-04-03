@@ -1,5 +1,8 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const hpp = require("hpp");
 const env = require("./config/env");
 const connectDB = require("./config/db");
 const notFound = require("./middleware/notFound");
@@ -13,13 +16,16 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
+app.use(helmet());
+app.use(mongoSanitize());
+app.use(hpp());
 app.use(
   cors({
     origin: env.clientOrigin === "*" ? true : env.clientOrigin,
     credentials: true
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: "10kb" }));
 
 app.get("/api/health", (req, res) => {
   res.json({

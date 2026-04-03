@@ -42,7 +42,7 @@ const register = asyncHandler(async (req, res) => {
     name,
     email,
     password,
-    role: role === "organizer" || role === "admin" ? role : "user"
+    role: role === "organizer" ? role : "user"
   });
 
   sendUserResponse(res, 201, "User registered successfully", user);

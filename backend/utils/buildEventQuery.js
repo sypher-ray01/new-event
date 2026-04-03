@@ -2,27 +2,41 @@ function buildEventQuery(query) {
   const filters = {};
 
   if (query.status) {
+    if (typeof query.status !== 'string') {
+      throw new Error('Invalid status parameter');
+    }
     filters.status = query.status;
   }
 
   if (query.category) {
+    if (typeof query.category !== 'string') {
+      throw new Error('Invalid category parameter');
+    }
     filters.category = query.category;
   }
 
   if (query.search) {
+    if (typeof query.search !== 'string') {
+      throw new Error('Invalid search parameter');
+    }
+    const escapedSearch = query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     filters.$or = [
-      { title: { $regex: query.search, $options: "i" } },
-      { description: { $regex: query.search, $options: "i" } },
-      { "venue.city": { $regex: query.search, $options: "i" } },
-      { "venue.name": { $regex: query.search, $options: "i" } }
+      { title: { $regex: escapedSearch, $options: "i" } },
+      { description: { $regex: escapedSearch, $options: "i" } },
+      { "venue.city": { $regex: escapedSearch, $options: "i" } },
+      { "venue.name": { $regex: escapedSearch, $options: "i" } }
     ];
   }
 
   if (query.location) {
+    if (typeof query.location !== 'string') {
+      throw new Error('Invalid location parameter');
+    }
+    const escapedLocation = query.location.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     filters.$or = (filters.$or || []).concat([
-      { "venue.city": { $regex: query.location, $options: "i" } },
-      { "venue.name": { $regex: query.location, $options: "i" } },
-      { "venue.address": { $regex: query.location, $options: "i" } }
+      { "venue.city": { $regex: escapedLocation, $options: "i" } },
+      { "venue.name": { $regex: escapedLocation, $options: "i" } },
+      { "venue.address": { $regex: escapedLocation, $options: "i" } }
     ]);
   }
 

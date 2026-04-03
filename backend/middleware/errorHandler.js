@@ -1,4 +1,12 @@
 function errorHandler(err, req, res, next) {
+  // Handle payload too large error from express.json limit
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({
+      success: false,
+      message: 'Payload too large. Maximum request size is 10kb.'
+    });
+  }
+
   const statusCode = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;
 
   if (err.name === "ValidationError") {
