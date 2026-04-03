@@ -1,0 +1,59 @@
+# =============================
+# Node
+# =============================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =============================
+# Environment & Secrets
+# =============================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# =============================
+# Operating System
+# =============================
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# =============================
+# Editors & IDEs
+# =============================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+tempCodeRunnerFile.js
+
+# =============================
+# Build Outputs
+# =============================
+dist/
+build/
+.cache/
+
+# =============================
+# Logs
+# =============================
+logs/
+*.log
+
+# =============================
+# Testing
+# =============================
+coverage/
