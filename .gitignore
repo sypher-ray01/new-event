@@ -57,3 +57,5 @@ logs/
 # Testing
 # =============================
 coverage/
+
+SETUP.md
