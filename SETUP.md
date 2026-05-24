@@ -32,7 +32,7 @@ NODE_ENV=development
 MONGODB_URI=mongodb://localhost:27017/eventhub
 
 # For MongoDB Atlas (cloud):
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/eventhub
+# MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/eventhub
 
 # JWT Configuration
 JWT_SECRET=your_super_secret_jwt_key_change_this_in_production_min_32_characters
